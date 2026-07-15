@@ -13,15 +13,10 @@ import RecruiterDashboard from './pages/RecruiterDashboard';
 import PostJobForm from './components/PostJobForm';
 import CandidatePanel from './components/CandidatePanel';
 import AdminPanel from './pages/AdminPanel';
+import ResumeUpload from './pages/ResumeUpload';
 import { useNavigate, Link } from 'react-router-dom';
 
-// Dummy dashboards for now
-const StudentDashboard = () => (
-  <div className="p-10 text-white">
-    <h2 className="text-4xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Welcome back!</h2>
-    <p className="text-gray-400 text-lg">Use the navigation above to browse jobs or track your applications.</p>
-  </div>
-);
+import StudentDashboard from './pages/StudentDashboard';
 
 
 
@@ -61,6 +56,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <JobDetails />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/dashboard/student/resume" 
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <ResumeUpload />
             </ProtectedRoute>
           } 
         />

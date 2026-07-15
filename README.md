@@ -46,43 +46,43 @@ Make sure you have the following installed:
 - Git
 
 ### 1. Clone the Repository
-\`\`\`bash
+```bash
 git clone https://github.com/apeksha-05/career_genie.git
 cd career_genie
-\`\`\`
+```
 
 ### 2. Backend Setup
 Navigate to the `backend` folder and install dependencies:
-\`\`\`bash
+```bash
 cd backend
 npm install
-\`\`\`
+```
 
 Create a `.env` file in the `backend` directory and add the following variables:
-\`\`\`env
+```env
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/careergenie
 FRONTEND_URL=http://localhost:5173
 JWT_SECRET=your_super_secret_jwt_key
-\`\`\`
+```
 
 Start the backend server:
-\`\`\`bash
+```bash
 npm start 
 # Or use `node server.js`
-\`\`\`
+```
 
 ### 3. Frontend Setup
 Open a new terminal window, navigate to the `frontend` folder and install dependencies:
-\`\`\`bash
+```bash
 cd frontend
 npm install
-\`\`\`
+```
 
 Start the frontend development server:
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 The application will be running at `http://localhost:5173`.
 
@@ -92,10 +92,10 @@ The application will be running at `http://localhost:5173`.
 
 The backend includes a suite of automated unit and integration tests.
 To run the tests:
-\`\`\`bash
+```bash
 cd backend
 npm test
-\`\`\`
+```
 
 ---
 

@@ -33,8 +33,10 @@ app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
+const resumeRoutes = require('./routes/resumeRoutes');
+
 // Stubs for other routes
-app.use('/api/v1/resumes', (req, res) => res.status(501).json({ error: 'Not Implemented' }));
+app.use('/api/v1/resumes', resumeRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
