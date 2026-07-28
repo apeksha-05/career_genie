@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Search, FileText, ChevronRight, Key, TrendingUp } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Search, FileText, ChevronRight, Key, TrendingUp, Briefcase } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -74,7 +74,7 @@ const LandingPage = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">Trending Opportunities</h2>
                 <p className="text-gray-500 text-lg">Recommended based on your profile skills and academic performance.</p>
               </div>
-              <Link to="/jobs" className="hidden sm:flex items-center text-brand-900 font-medium hover:text-brand-700 transition">
+              <Link to="/signup" className="hidden sm:flex items-center text-brand-900 font-medium hover:text-brand-700 transition">
                 View All Openings
                 <ChevronRight className="ml-1 h-5 w-5" />
               </Link>
@@ -161,7 +161,7 @@ const LandingPage = () => {
             </div>
             
             <div className="mt-8 text-center sm:hidden">
-              <Link to="/jobs" className="inline-flex items-center text-brand-900 font-medium">
+              <Link to="/signup" className="inline-flex items-center text-brand-900 font-medium">
                 View All Openings <ChevronRight className="ml-1 h-5 w-5" />
               </Link>
             </div>

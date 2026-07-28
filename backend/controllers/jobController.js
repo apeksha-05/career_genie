@@ -64,21 +64,26 @@ exports.getJobById = async (req, res) => {
 exports.createJob = async (req, res) => {
   try {
     const { title, company, location, description, requirements, salary } = req.body;
-    
+
+    // Input validation
+    if (!title || !company || !location || !description) {
+      return res.status(400).json({ success: false, error: 'title, company, location, and description are required' });
+    }
+
     const job = new JobPosting({
       title,
       company,
       location,
       description,
-      requirements,
+      requirements: Array.isArray(requirements) ? requirements : [],
       salary,
       postedBy: req.user.id,
     });
     
     await job.save();
 
-    // Notify students whose skills overlap with this job's requirements
-    // Run in background — don't await so the API response is instant
+    // Notify students whose skills overlap with this job's requirements.
+    // Run in background — don't await so the API response is instant.
     (async () => {
       try {
         const allResumes = await Resume.find({ extractedSkills: { $exists: true, $not: { $size: 0 } } });

@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/authSlice';
 import { GraduationCap, Briefcase } from 'lucide-react';
+import { signup as signupApi } from '../api/auth';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 const AuthLayout = ({ children, title, subtitle }) => {
   return (
@@ -68,20 +71,15 @@ const Signup = () => {
         return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password, role })
-      });
-      const data = await res.json();
+      const data = await signupApi(formData.name, formData.email, formData.password, role);
       if (data.success) {
         dispatch(setCredentials({ user: data.data, token: data.data.token }));
         navigate(role === 'student' ? '/dashboard/student' : '/dashboard/recruiter');
       } else {
-        alert(data.error);
+        alert(data.error || 'Failed to sign up');
       }
     } catch (err) {
-      alert('Error signing up');
+      alert(err.message || 'Error signing up');
     }
   };
 
@@ -121,47 +119,35 @@ const Signup = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input 
-              type="text" 
-              required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none"
-              placeholder="John Doe"
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-            <input 
-              type="email" 
-              required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none"
-              placeholder="john@university.edu"
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-            />
-          </div>
+          <Input 
+            type="text" 
+            required
+            label="Full Name"
+            placeholder="John Doe"
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+          />
+          <Input 
+            type="email" 
+            required
+            label="Email Address"
+            placeholder="john@university.edu"
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+          />
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input 
-                type="password" 
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none"
-                placeholder="••••••••"
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-              <input 
-                type="password" 
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none"
-                placeholder="••••••••"
-                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-              />
-            </div>
+            <Input 
+              type="password" 
+              required
+              label="Password"
+              placeholder="••••••••"
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+            <Input 
+              type="password" 
+              required
+              label="Confirm Password"
+              placeholder="••••••••"
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+            />
           </div>
 
           <div className="flex items-start mt-4">
@@ -171,12 +157,13 @@ const Signup = () => {
             </label>
           </div>
 
-          <button 
+          <Button 
             type="submit"
-            className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-brand-900 hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all mt-6"
+            fullWidth
+            className="mt-6"
           >
             Create Account
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8">
@@ -190,10 +177,10 @@ const Signup = () => {
           </div>
 
           <div className="mt-6">
-            <button className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
+            <Button variant="outline" fullWidth className="!font-semibold !text-gray-700 !border-gray-300">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5 mr-2" />
               Continue with Google
-            </button>
+            </Button>
           </div>
         </div>
 

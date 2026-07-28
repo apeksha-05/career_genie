@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, CheckCircle2, AlertTriangle, XCircle, Loader2, Download, RefreshCw } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import { useSelector } from 'react-redux';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 
 const ResumeUpload = () => {
   const [file, setFile] = useState(null);
@@ -10,8 +11,12 @@ const ResumeUpload = () => {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  
+
   const fileInputRef = useRef(null);
+  const token = useSelector((state) => state.auth.token);
+  const API_BASE = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace('/auth', '')
+    : 'http://localhost:5000/api/v1';
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -70,9 +75,7 @@ const ResumeUpload = () => {
         });
       }, 300);
 
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('http://localhost:5000/api/v1/resumes/upload', {
+      const response = await fetch(`${API_BASE}/resumes/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -99,10 +102,7 @@ const ResumeUpload = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      {/* Either use Navbar or assume it's part of a dashboard layout. Based on screenshot, it has the public Navbar. */}
-      <Navbar />
-
-      <main className="flex-grow pt-28 pb-20">
+      <main className="flex-grow pt-8 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="mb-10">
@@ -149,19 +149,22 @@ const ResumeUpload = () => {
                     {file && <p className="text-sm font-medium text-brand-900 mb-4 truncate w-full px-4">{file.name}</p>}
 
                     {!file ? (
-                      <button 
+                      <Button 
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-8 py-3 bg-brand-900 text-white font-medium rounded-xl hover:bg-brand-800 transition-colors shadow-md"
+                        variant="solid"
+                        className="px-8 shadow-md"
                       >
                         Browse Files
-                      </button>
+                      </Button>
                     ) : (
-                      <button 
+                      <Button 
                         onClick={handleUpload}
-                        className="px-8 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-colors shadow-md w-full"
+                        variant="solid"
+                        fullWidth
+                        className="!bg-green-600 hover:!bg-green-700 shadow-md"
                       >
                         Analyze Resume
-                      </button>
+                      </Button>
                     )}
                   </>
                 )}
@@ -171,7 +174,7 @@ const ResumeUpload = () => {
 
             {/* Right Column - Results */}
             <div className="lg:col-span-8">
-              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-8 h-full flex flex-col">
+              <Card className="p-8 h-full flex flex-col">
                 
                 {!result ? (
                   <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
@@ -192,7 +195,7 @@ const ResumeUpload = () => {
                             cy="64" 
                             r="56" 
                             fill="none" 
-                            stroke="#0F4CBA" 
+                            stroke="var(--color-brand-900)" 
                             strokeWidth="12" 
                             strokeDasharray="351.8" 
                             strokeDashoffset={351.8 - (351.8 * result.score) / 100} 
@@ -220,7 +223,7 @@ const ResumeUpload = () => {
                           <CheckCircle2 className="text-green-500 mr-2 h-6 w-6" /> Key Strengths
                         </h3>
                         <div className="space-y-4">
-                          {result.strengths.slice(0, 2).map((strength, idx) => (
+                          {(result?.strengths || []).slice(0, 2).map((strength, idx) => (
                             <div key={idx} className="bg-green-50 border border-green-100 rounded-xl p-4 flex items-start">
                               <CheckCircle2 className="text-green-500 mt-0.5 mr-3 h-5 w-5 shrink-0" />
                               <p className="text-sm text-gray-700">{strength}</p>
@@ -235,13 +238,13 @@ const ResumeUpload = () => {
                           <AlertTriangle className="text-yellow-500 mr-2 h-6 w-6" /> Areas to Improve
                         </h3>
                         <div className="space-y-4">
-                          {result.weaknesses.slice(0, 1).map((weakness, idx) => (
+                          {(result?.weaknesses || []).slice(0, 1).map((weakness, idx) => (
                             <div key={idx} className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex items-start">
                               <AlertTriangle className="text-orange-500 mt-0.5 mr-3 h-5 w-5 shrink-0" />
                               <p className="text-sm text-gray-700">{weakness}</p>
                             </div>
                           ))}
-                          {result.suggestions.slice(0, 1).map((suggestion, idx) => (
+                          {(result?.suggestions || []).slice(0, 1).map((suggestion, idx) => (
                             <div key={idx} className="bg-red-50 border border-red-100 rounded-xl p-4 flex items-start">
                               <XCircle className="text-red-500 mt-0.5 mr-3 h-5 w-5 shrink-0" />
                               <p className="text-sm text-gray-700">{suggestion}</p>
@@ -252,20 +255,22 @@ const ResumeUpload = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 mt-auto pt-8 border-t border-gray-100">
-                      <button className="flex-1 flex items-center justify-center py-3 bg-brand-900 text-white rounded-xl font-medium hover:bg-brand-800 transition-colors">
+                      <Button variant="solid" fullWidth className="py-3">
                         <Download className="mr-2 h-5 w-5" /> Download Feedback Report
-                      </button>
-                      <button 
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        fullWidth
+                        className="py-3"
                         onClick={() => { setFile(null); setResult(null); }}
-                        className="flex-1 flex items-center justify-center py-3 bg-white text-brand-900 border border-brand-900 rounded-xl font-medium hover:bg-blue-50 transition-colors"
                       >
                         <RefreshCw className="mr-2 h-5 w-5" /> Re-upload Resume
-                      </button>
+                      </Button>
                     </div>
                   </>
                 )}
 
-              </div>
+              </Card>
             </div>
           </div>
           
@@ -306,8 +311,6 @@ const ResumeUpload = () => {
 
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

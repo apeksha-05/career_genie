@@ -1,19 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
-import { MoreHorizontal, Search, Bell, Settings, Filter, Plus, Briefcase, PenTool, Cloud, Shield, Video, Trophy, Paperclip } from 'lucide-react';
-
-const initialApplications = [
-  { id: 1, title: 'Software Engineer', company: 'TechCorp Inc.', date: 'Oct 12, 2023', match: '94%', status: 'Applied', icon: Briefcase, color: 'blue' },
-  { id: 2, title: 'Data Analyst Intern', company: 'InsightFlow', date: 'Oct 14, 2023', match: '88%', status: 'Applied', icon: Briefcase, color: 'indigo' },
-  { id: 3, title: 'Product Design Fellow', company: 'CreativeFlow', date: 'Oct 08, 2023', match: '98%', status: 'Under Review', icon: PenTool, color: 'purple' },
-  { id: 4, title: 'Cloud Arch Specialist', company: 'SkyScale Solutions', date: 'Sep 28, 2023', match: '92%', status: 'Interview', icon: Cloud, color: 'cyan', nextStep: 'Round 2: Technical', nextDate: 'Tomorrow at 2:00 PM' },
-  { id: 5, title: 'Cybersecurity Intern', company: 'SecureGate Ltd.', date: 'Sep 15, 2023', match: '85%', status: 'Accepted', icon: Shield, color: 'green' }
-];
-
+import { MoreHorizontal, Filter, Plus, Briefcase, PenTool, Cloud, Shield, Video, Trophy, Paperclip, Calendar } from 'lucide-react';
 import TopHeader from '../components/TopHeader';
+import { useSelector } from 'react-redux';
+import { getMyApplications } from '../api/applications';
+import EmptyState from '../components/ui/EmptyState';
+import ErrorState from '../components/ui/ErrorState';
+import Button from '../components/ui/Button';
+
+const STATUS_MAP = {
+  applied:      'Applied',
+  under_review: 'Under Review',
+  interview:    'Interview',
+  accepted:     'Accepted',
+  rejected:     'Rejected',
+};
 
 const ApplicationsTracker = () => {
-  const [apps, setApps] = useState(initialApplications);
+  const [apps, setApps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+
+  useEffect(() => {
+    if (!token) return;
+    getMyApplications(token)
+      .then(res => {
+        // Map API data to the kanban card shape
+        const mapped = (res.data || []).map(app => ({
+          id: app._id,
+          title: app.jobId?.title || 'Unknown Job',
+          company: app.jobId?.company || '',
+          date: new Date(app.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          match: `${app.matchPercentage ?? 0}%`,
+          status: STATUS_MAP[app.status] || app.status,
+          icon: Briefcase,
+        }));
+        setApps(mapped);
+      })
+      .catch((err) => setError(err.message || "Failed to load applications."))
+      .finally(() => setLoading(false));
+  }, [token]);
 
   const getColumnColor = (status) => {
     switch(status) {
@@ -35,12 +62,12 @@ const ApplicationsTracker = () => {
     }
   };
 
-  const columns = ['Applied', 'Under Review', 'Interview', 'Accepted'];
+  const columns = ['Applied', 'Under Review', 'Interview', 'Accepted', 'Rejected'];
 
   return (
     <div className="flex bg-gray-50 min-h-screen font-sans">
       <Sidebar role="student" />
-      
+
       <main className="flex-1 overflow-x-hidden flex flex-col h-screen">
         <TopHeader showNav={true} />
 
@@ -57,14 +84,27 @@ const ApplicationsTracker = () => {
                 <Filter className="w-4 h-4 mr-2" />
                 Sort by: Most Recent
               </button>
-              <button className="flex items-center px-4 py-2 bg-brand-900 rounded-lg text-sm font-medium text-white shadow-sm hover:bg-brand-800 transition-colors">
-                <Plus className="w-4 h-4 mr-2" />
-                New Application
-              </button>
             </div>
           </div>
 
-          {/* Kanban Board */}
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-900" />
+            </div>
+          ) : error ? (
+            <ErrorState 
+              title="Failed to load tracking data"
+              message={error}
+              onRetry={() => window.location.reload()}
+            />
+          ) : apps.length === 0 ? (
+            <EmptyState 
+              icon={Briefcase}
+              title="No applications yet"
+              description="You haven't applied to any jobs yet. Start exploring jobs to begin your career journey!"
+              action={<Button variant="solid" onClick={() => window.location.href = '/dashboard/student/jobs'}>Find Jobs</Button>}
+            />
+          ) : (
           <div className="flex space-x-6 overflow-x-auto pb-8 snap-x">
             {columns.map(col => {
               const colApps = apps.filter(a => a.status === col);
@@ -80,7 +120,9 @@ const ApplicationsTracker = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {colApps.map(app => (
+                    {colApps.length === 0 ? (
+                      <div className="text-center py-10 text-gray-400 text-sm">No applications</div>
+                    ) : colApps.map(app => (
                       <div key={app.id} className={`bg-white rounded-xl p-5 shadow-sm border-l-4 border-y border-r border-gray-100 ${getBorderColor(app.status)} hover:shadow-md transition-shadow cursor-pointer group`}>
                         <div className="flex justify-between items-start mb-4">
                           <div className={`w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600`}>
@@ -90,10 +132,10 @@ const ApplicationsTracker = () => {
                             {app.match} Match
                           </span>
                         </div>
-                        
+
                         <h4 className="font-bold text-gray-900 text-base mb-1">{app.title}</h4>
                         <p className="text-sm text-gray-500 mb-4">{app.company}</p>
-                        
+
                         {app.nextStep && (
                           <div className="bg-blue-50 rounded-lg p-3 mb-4 flex items-start">
                             <Video className="w-4 h-4 text-brand-900 mr-2 mt-0.5 shrink-0" />
@@ -116,20 +158,15 @@ const ApplicationsTracker = () => {
                     ))}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
+          )}
         </div>
       </main>
     </div>
   );
 };
 
-// Reusable Calendar Icon since it wasn't imported from lucide-react in this block
-const Calendar = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
-
 export default ApplicationsTracker;
+

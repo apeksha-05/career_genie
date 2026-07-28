@@ -5,12 +5,12 @@ const fs = require('fs');
 const path = require('path');
 const Resume = require('../models/Resume');
 
-// Multer storage setup
+// ── Multer storage setup ────────────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(__dirname, '../uploads');
     if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath);
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
     cb(null, uploadPath);
   },
@@ -32,8 +32,30 @@ const upload = multer({
   }
 }).single('resume');
 
+// ── Simple keyword extractor for skill identification ───────────────────────
+// Extracts known tech/skill keywords from the resume text as a fallback
+// when the Python analysis service is unavailable.
+const KNOWN_SKILLS = [
+  'javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'ruby', 'go', 'rust', 'swift', 'kotlin',
+  'react', 'angular', 'vue', 'node.js', 'nodejs', 'express', 'django', 'flask', 'spring', 'fastapi',
+  'sql', 'mysql', 'postgresql', 'mongodb', 'redis', 'elasticsearch', 'sqlite',
+  'aws', 'azure', 'gcp', 'docker', 'kubernetes', 'terraform', 'ci/cd', 'jenkins', 'github actions',
+  'machine learning', 'deep learning', 'tensorflow', 'pytorch', 'scikit-learn', 'pandas', 'numpy',
+  'html', 'css', 'sass', 'tailwind', 'graphql', 'rest', 'api', 'microservices',
+  'git', 'linux', 'agile', 'scrum', 'data structures', 'algorithms', 'system design',
+];
+
+const extractSkillsFromText = (text) => {
+  const lowerText = text.toLowerCase();
+  return KNOWN_SKILLS.filter(skill => lowerText.includes(skill));
+};
+
+// ── Controller ──────────────────────────────────────────────────────────────
 const uploadResume = async (req, res) => {
   upload(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
     if (err) {
       return res.status(400).json({ success: false, error: err.message });
     }
@@ -43,54 +65,60 @@ const uploadResume = async (req, res) => {
     }
 
     try {
-      // 1. Read the PDF file
+      // 1. Read and parse the PDF
       const filePath = req.file.path;
       const dataBuffer = fs.readFileSync(filePath);
-      
-      // 2. Parse text from PDF
       const pdfData = await pdfParse(dataBuffer);
       const parsedText = pdfData.text;
 
-      // 3. Send text to Python Analysis Microservice
+      // 2. Extract skills from parsed text (local, always works)
+      const extractedSkills = extractSkillsFromText(parsedText);
+
+      // 3. Send text to Python Analysis Microservice (optional, graceful fallback)
       let analysisResult = null;
       try {
-        const response = await axios.post('http://localhost:8000/analyze', {
-          text: parsedText
-        });
+        const response = await axios.post(
+          process.env.ANALYSIS_SERVICE_URL || 'http://localhost:8000/analyze',
+          { text: parsedText },
+          { timeout: 10000 }
+        );
         analysisResult = response.data;
       } catch (analysisErr) {
-        console.error('Error connecting to analysis service:', analysisErr.message);
-        // Provide a fallback or re-throw
+        console.error('Analysis service unavailable, using local fallback:', analysisErr.message);
+        // Local fallback analysis
+        const score = Math.min(50 + extractedSkills.length * 5, 100);
         analysisResult = {
-          score: 50,
-          strengths: ['Resume uploaded successfully.'],
-          weaknesses: ['Analysis service unavailable.'],
-          suggestions: ['Please try analyzing again later.']
+          score,
+          strengths: extractedSkills.length > 0
+            ? [`Identified ${extractedSkills.length} technical skills: ${extractedSkills.slice(0, 3).join(', ')}`]
+            : ['Resume uploaded successfully.'],
+          weaknesses: extractedSkills.length < 3
+            ? ['Few technical keywords detected — add more specific skills.']
+            : [],
+          suggestions: ['Ensure your resume includes measurable achievements (e.g. "Reduced load time by 30%").'],
         };
       }
 
-      // 4. Save to Database
+      // 4. Save / update resume in database
       const userId = req.user.id;
-      
-      // Check if user already has a resume
-      let resume = await Resume.findOne({ studentId: userId });
-      
       const fileUrl = `/uploads/${req.file.filename}`;
-      
+
+      let resume = await Resume.findOne({ studentId: userId });
+
       if (resume) {
-        // Update existing
         resume.fileUrl = fileUrl;
         resume.parsedText = parsedText;
+        resume.extractedSkills = extractedSkills;
         resume.analysisResult = analysisResult;
         resume.version += 1;
         await resume.save();
       } else {
-        // Create new
         resume = new Resume({
           studentId: userId,
           fileUrl,
           parsedText,
-          analysisResult
+          extractedSkills,
+          analysisResult,
         });
         await resume.save();
       }
@@ -98,7 +126,7 @@ const uploadResume = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: 'Resume uploaded and analyzed successfully',
-        data: resume
+        data: resume,
       });
 
     } catch (error) {
@@ -108,16 +136,5 @@ const uploadResume = async (req, res) => {
   });
 };
 
-const handleUploadError = (err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    return res.status(400).json({ success: false, error: err.message });
-  } else if (err) {
-    return res.status(400).json({ success: false, error: err.message });
-  }
-  next();
-};
+module.exports = { uploadResume };
 
-module.exports = {
-  uploadResume,
-  handleUploadError
-};

@@ -4,6 +4,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { setCredentials } from '../store/authSlice';
 import AuthLayout from '../components/AuthLayout';
 import { Eye } from 'lucide-react';
+import { login as loginApi } from '../api/auth';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 const Login = () => {
   const [role, setRole] = useState('student');
@@ -20,12 +23,7 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
+      const data = await loginApi(email, password);
       
       if (data.success) {
         dispatch(setCredentials({ user: data.data, token: data.data.token }));
@@ -35,10 +33,10 @@ const Login = () => {
         else if (data.data.role === 'admin') navigate('/admin');
         else navigate('/');
       } else {
-        setError(data.error);
+        setError(data.error || 'Failed to log in');
       }
     } catch (err) {
-      setError('Failed to log in');
+      setError(err.message || 'Failed to log in');
     } finally {
       setLoading(false);
     }
@@ -77,17 +75,14 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-            <input 
-              type="email" 
-              required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none"
-              placeholder="name@university.edu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          <Input 
+            type="email" 
+            required
+            label="Email Address"
+            placeholder="name@university.edu"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-sm font-medium text-gray-700">Password</label>
@@ -115,13 +110,14 @@ const Login = () => {
             </label>
           </div>
 
-          <button 
+          <Button 
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-brand-900 hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all mt-6 disabled:opacity-70"
+            fullWidth
+            className="mt-6"
           >
             {loading ? 'Logging in...' : 'Login'}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8">
@@ -135,10 +131,10 @@ const Login = () => {
           </div>
 
           <div className="mt-6">
-            <button className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
+            <Button variant="outline" fullWidth className="!font-semibold !text-gray-700 !border-gray-300">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5 mr-2" />
               Continue with Google
-            </button>
+            </Button>
           </div>
         </div>
 

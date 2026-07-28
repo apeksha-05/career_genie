@@ -13,7 +13,15 @@ const generateToken = (user) => {
 exports.signup = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    
+
+    // Input validation
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, error: 'Name, email, and password are required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+    }
+
     // Valid roles check
     const validRoles = ['student', 'recruiter', 'admin'];
     const assignedRole = validRoles.includes(role) ? role : 'student';
@@ -63,6 +71,11 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Input validation
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: 'Email and password are required' });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {

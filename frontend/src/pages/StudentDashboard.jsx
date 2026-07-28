@@ -1,11 +1,16 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Sidebar from '../components/Sidebar';
 import { Calendar, BarChart2, Briefcase, Send, Download, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import TopHeader from '../components/TopHeader';
+import JobCard from '../components/JobCard';
+import Button from '../components/ui/Button';
 
 const StudentDashboard = () => {
+  const { user } = useSelector((state) => state.auth);
+
   return (
     <div className="flex bg-gray-50 min-h-screen font-sans">
       <Sidebar role="student" />
@@ -17,7 +22,7 @@ const StudentDashboard = () => {
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-1">Welcome back, Alex</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-1">Welcome back, {user?.name || 'Student'}</h2>
               <p className="text-gray-500">Your career journey is looking promising today.</p>
             </div>
             <div className="flex items-center text-sm font-medium text-gray-600 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
@@ -120,83 +125,52 @@ const StudentDashboard = () => {
             <div className="lg:col-span-7 flex flex-col">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-gray-900">Recommended Jobs</h3>
-                <Link to="/jobs" className="text-sm font-medium text-brand-900 flex items-center hover:underline">
+                <Link to="/dashboard/student/jobs" className="text-sm font-medium text-brand-900 flex items-center hover:underline">
                   View All <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
 
               <div className="space-y-4 flex-grow">
-                {/* Job Card */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center">
-                  <div className="w-12 h-12 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center text-blue-600 font-bold mr-4 shrink-0">
-                    TC
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-base font-bold text-gray-900">Software Engineering Intern</h4>
-                    <p className="text-sm text-gray-500">TechCorp • Palo Alto, CA (Remote)</p>
-                  </div>
-                  <div className="text-right flex flex-col items-end">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
-                      <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      98% Match
-                    </span>
-                    <span className="text-xs text-gray-400">Posted 2d ago</span>
-                  </div>
-                </div>
-
-                {/* Job Card 2 */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center">
-                  <div className="w-12 h-12 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center text-indigo-600 font-bold mr-4 shrink-0">
-                    CF
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-base font-bold text-gray-900">Junior Frontend Developer</h4>
-                    <p className="text-sm text-gray-500">CreativeFlow • Austin, TX</p>
-                  </div>
-                  <div className="text-right flex flex-col items-end">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 mb-2">
-                      <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      92% Match
-                    </span>
-                    <span className="text-xs text-gray-400">Posted 5d ago</span>
-                  </div>
-                </div>
-
-                {/* Job Card 3 */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center">
-                  <div className="w-12 h-12 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center text-blue-500 font-bold mr-4 shrink-0">
-                    FS
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-base font-bold text-gray-900">Data Analyst Intern</h4>
-                    <p className="text-sm text-gray-500">Finalyze Systems • New York, NY</p>
-                  </div>
-                  <div className="text-right flex flex-col items-end">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
-                      <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      88% Match
-                    </span>
-                    <span className="text-xs text-gray-400">Posted 1w ago</span>
-                  </div>
-                </div>
-
-                {/* Job Card 4 */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center">
-                  <div className="w-12 h-12 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center text-gray-800 font-bold mr-4 shrink-0">
-                    CS
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-base font-bold text-gray-900">Product Design Fellow</h4>
-                    <p className="text-sm text-gray-500">CloudScale UI • Remote</p>
-                  </div>
-                  <div className="text-right flex flex-col items-end">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 mb-2">
-                      <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      85% Match
-                    </span>
-                    <span className="text-xs text-gray-400">Posted 3d ago</span>
-                  </div>
-                </div>
+                {[
+                  {
+                    _id: '1',
+                    title: 'Software Engineering Intern',
+                    company: 'TechCorp',
+                    location: 'Palo Alto, CA (Remote)',
+                    matchPercentage: 98,
+                    postedAt: '2d ago',
+                    companyLogo: null,
+                  },
+                  {
+                    _id: '2',
+                    title: 'Junior Frontend Developer',
+                    company: 'CreativeFlow',
+                    location: 'Austin, TX',
+                    matchPercentage: 92,
+                    postedAt: '5d ago',
+                    companyLogo: null,
+                  },
+                  {
+                    _id: '3',
+                    title: 'Data Analyst Intern',
+                    company: 'Finalyze Systems',
+                    location: 'New York, NY',
+                    matchPercentage: 88,
+                    postedAt: '1w ago',
+                    companyLogo: null,
+                  },
+                  {
+                    _id: '4',
+                    title: 'Product Design Fellow',
+                    company: 'CloudScale UI',
+                    location: 'Remote',
+                    matchPercentage: 85,
+                    postedAt: '3d ago',
+                    companyLogo: null,
+                  }
+                ].map(job => (
+                  <JobCard key={job._id} job={job} variant="compact" />
+                ))}
               </div>
 
               {/* Banner ad */}
@@ -205,17 +179,16 @@ const StudentDashboard = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-900/40 p-6 flex flex-col justify-center items-start">
                   <h4 className="text-white font-bold text-xl mb-2">Prepare for your next interview</h4>
                   <p className="text-gray-200 text-sm max-w-sm mb-4">Use our AI interview simulator to practice role-specific questions for TechCorp.</p>
-                  <button className="bg-white text-gray-900 px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors">Start Practice</button>
+                  <Button variant="solid" className="bg-white !text-gray-900 hover:bg-gray-100">Start Practice</Button>
                 </div>
               </div>
-
             </div>
+          </div>
         </div>
-        </div>
-        </div>
-      </main>
-    </div>
-  );
+      </div>
+    </main>
+  </div>
+);
 };
 
 export default StudentDashboard;

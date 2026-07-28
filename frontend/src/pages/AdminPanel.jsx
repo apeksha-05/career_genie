@@ -1,9 +1,15 @@
 import React from 'react';
 import Sidebar from '../components/Sidebar';
 import TopHeader from '../components/TopHeader';
+import { useSelector } from 'react-redux';
 import { AlertTriangle, Users, Briefcase, CheckCircle, Search, MoreVertical, X, Check, Eye } from 'lucide-react';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import ApplicationStatusBadge from '../components/ui/ApplicationStatusBadge';
 
 const AdminPanel = () => {
+  const { user } = useSelector((state) => state.auth);
   const customRightItem = (
     <div className="flex items-center space-x-6">
       <button className="relative text-gray-400 hover:text-gray-600 transition-colors">
@@ -14,7 +20,7 @@ const AdminPanel = () => {
       </button>
       <div className="flex items-center text-right">
         <div className="mr-3 hidden md:block">
-          <p className="text-sm font-bold text-gray-900">Alex Sterling</p>
+          <p className="text-sm font-bold text-gray-900">{user?.name || 'Administrator'}</p>
           <p className="text-xs text-gray-500">System Administrator</p>
         </div>
         <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-200 cursor-pointer">
@@ -45,7 +51,7 @@ const AdminPanel = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
+              <Card className="p-6 relative overflow-hidden">
                 <div className="flex justify-between items-start mb-6 relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-brand-900">
                     <Users className="w-5 h-5" />
@@ -63,7 +69,7 @@ const AdminPanel = () => {
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100">
                   <div className="h-full bg-brand-900 w-1/2"></div>
                 </div>
-              </div>
+              </Card>
 
               <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
                 <div className="flex justify-between items-start mb-6 relative z-10">
@@ -107,7 +113,7 @@ const AdminPanel = () => {
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               
-              <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <Card className="lg:col-span-2 p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">Users Over Time</h3>
@@ -128,9 +134,9 @@ const AdminPanel = () => {
                   <div className="w-full bg-blue-400 rounded-t-sm h-[75%] hover:bg-blue-500 transition-colors relative group"><span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-gray-400">MAY</span></div>
                   <div className="w-full bg-brand-900 rounded-t-sm h-[90%] hover:bg-brand-800 transition-colors relative group"><span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-gray-900">JUN</span></div>
                 </div>
-              </div>
+              </Card>
 
-              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <Card className="p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-1">Applications</h3>
                 <p className="text-xs text-gray-500 mb-6">By Department</p>
                 
@@ -172,7 +178,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
 
             </div>
 
@@ -184,12 +190,12 @@ const AdminPanel = () => {
                   <p className="text-sm text-gray-500">Review pending listings from recruiters</p>
                 </div>
                 <div className="flex space-x-3">
-                  <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">View All</button>
-                  <button className="bg-blue-50 text-brand-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100">Bulk Approve</button>
+                  <Button variant="outline" size="sm">View All</Button>
+                  <Button variant="solid" size="sm" className="bg-blue-50 !text-brand-900 border-none hover:bg-blue-100">Bulk Approve</Button>
                 </div>
               </div>
               
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -217,7 +223,7 @@ const AdminPanel = () => {
                         </td>
                         <td className="p-4 text-gray-500">Oct 24, 2024</td>
                         <td className="p-4"><span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">BE/BTech</span></td>
-                        <td className="p-4"><span className="bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">Pending</span></td>
+                        <td className="p-4"><ApplicationStatusBadge status="pending" /></td>
                         <td className="p-4 text-center">
                           <div className="flex justify-center space-x-2">
                             <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors"><X className="w-4 h-4" /></button>
@@ -240,7 +246,7 @@ const AdminPanel = () => {
                         </td>
                         <td className="p-4 text-gray-500">Oct 23, 2024</td>
                         <td className="p-4"><span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">MBA/BBA</span></td>
-                        <td className="p-4"><span className="bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">Pending</span></td>
+                        <td className="p-4"><ApplicationStatusBadge status="pending" /></td>
                         <td className="p-4 text-center">
                           <div className="flex justify-center space-x-2">
                             <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors"><X className="w-4 h-4" /></button>
@@ -263,7 +269,7 @@ const AdminPanel = () => {
                         </td>
                         <td className="p-4 text-gray-500">Oct 22, 2024</td>
                         <td className="p-4"><span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">Masters</span></td>
-                        <td className="p-4"><span className="bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">Pending</span></td>
+                        <td className="p-4"><ApplicationStatusBadge status="pending" /></td>
                         <td className="p-4 text-center">
                           <div className="flex justify-center space-x-2">
                             <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors"><X className="w-4 h-4" /></button>
@@ -276,7 +282,7 @@ const AdminPanel = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </Card>
             </div>
 
             {/* User Management Cards */}
@@ -287,18 +293,17 @@ const AdminPanel = () => {
                   <p className="text-sm text-gray-500">Manage platform participants and permissions</p>
                 </div>
                 <div className="relative">
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                  <input 
+                  <Input 
                     type="text" 
                     placeholder="Search by name, email, or role..." 
-                    className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 w-72"
+                    icon={Search}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <Card className="p-4 flex items-center justify-between">
                   <div className="flex items-center">
                     <img src="https://i.pravatar.cc/150?u=a042" alt="Sarah" className="w-12 h-12 rounded-full object-cover mr-4" />
                     <div>
@@ -314,9 +319,9 @@ const AdminPanel = () => {
                     </div>
                   </div>
                   <button className="text-gray-400 hover:text-gray-600"><MoreVertical className="w-5 h-5" /></button>
-                </div>
+                </Card>
 
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <Card className="p-4 flex items-center justify-between">
                   <div className="flex items-center">
                     <img src="https://i.pravatar.cc/150?u=a0425" alt="Marcus" className="w-12 h-12 rounded-full object-cover mr-4" />
                     <div>
@@ -332,9 +337,9 @@ const AdminPanel = () => {
                     </div>
                   </div>
                   <button className="text-gray-400 hover:text-gray-600"><MoreVertical className="w-5 h-5" /></button>
-                </div>
+                </Card>
 
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between opacity-75">
+                <Card className="p-4 flex items-center justify-between opacity-75">
                   <div className="flex items-center">
                     <img src="https://i.pravatar.cc/150?u=a04258" alt="James" className="w-12 h-12 rounded-full object-cover mr-4 grayscale" />
                     <div>
@@ -350,7 +355,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
                   <button className="text-gray-400 hover:text-gray-600"><MoreVertical className="w-5 h-5" /></button>
-                </div>
+                </Card>
 
               </div>
             </div>

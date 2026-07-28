@@ -3,6 +3,7 @@ const JobPosting = require('../models/JobPosting');
 const Resume = require('../models/Resume');
 const User = require('../models/User');
 const { notifyNewApplicant, notifyStatusChange } = require('../services/notificationService');
+const { computeMatchPercentage } = require('../utils/matchScoring');
 
 // Student: Apply to a job
 exports.applyToJob = async (req, res) => {
@@ -53,20 +54,9 @@ exports.getMyApplications = async (req, res) => {
     const resume = await Resume.findOne({ studentId: req.user.id }).sort({ createdAt: -1 });
     const skills = resume ? resume.extractedSkills : [];
 
-    const computeMatch = (resumeSkills, jobRequirements) => {
-      if (!resumeSkills || !jobRequirements || jobRequirements.length === 0) return 0;
-      const lower = resumeSkills.map(s => s.toLowerCase());
-      const reqLower = jobRequirements.map(s => s.toLowerCase());
-      let matches = 0;
-      reqLower.forEach(req => {
-        if (lower.some(skill => skill.includes(req) || req.includes(skill))) matches++;
-      });
-      return Math.min(Math.round((matches / jobRequirements.length) * 100), 100);
-    };
-
     const enriched = applications.map(app => ({
       ...app,
-      matchPercentage: app.jobId ? computeMatch(skills, app.jobId.requirements) : 0,
+      matchPercentage: app.jobId ? computeMatchPercentage(skills, app.jobId.requirements) : 0,
     }));
 
     res.json({ success: true, data: enriched });
