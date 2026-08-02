@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import TopHeader from '../components/TopHeader';
 import { useSelector } from 'react-redux';
@@ -363,8 +364,8 @@ const AdminPanel = () => {
             <div className="mt-12 pt-6 border-t border-gray-200 flex justify-between items-center text-xs text-gray-400 mb-8">
               <p>© 2024 CareerGenie Platform. Institutional Admin Portal.</p>
               <div className="flex space-x-6">
-                <a href="#" className="hover:text-gray-600">Privacy Policy</a>
-                <a href="#" className="hover:text-gray-600">Terms of Service</a>
+                <Link to="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
+                <Link to="/terms" className="hover:text-gray-600">Terms of Service</Link>
                 <a href="#" className="hover:text-gray-600">Security Audit</a>
               </div>
             </div>

@@ -18,6 +18,16 @@ import ResumeUpload from './pages/ResumeUpload';
 import StudentDashboard from './pages/StudentDashboard';
 import Unauthorized from './pages/Unauthorized';
 
+// Public informational pages
+import CompaniesPage from './pages/CompaniesPage';
+import ResumeTipsPage from './pages/ResumeTipsPage';
+import ForRecruitersPage from './pages/ForRecruitersPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import SupportPage from './pages/SupportPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+
 function App() {
   const dispatch = useDispatch();
 
@@ -33,6 +43,16 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* Public informational pages */}
+        <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/resume-tips" element={<ResumeTipsPage />} />
+        <Route path="/for-recruiters" element={<ForRecruitersPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsOfServicePage />} />
 
         {/* Student routes */}
         <Route

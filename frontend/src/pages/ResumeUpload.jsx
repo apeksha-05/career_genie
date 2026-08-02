@@ -89,9 +89,13 @@ const ResumeUpload = () => {
       const data = await response.json();
       
       if (response.ok) {
-        setResult(data.data.analysisResult);
+        if (data?.data?.analysisResult) {
+          setResult(data.data.analysisResult);
+        } else {
+          setError('Analysis failed: No result returned.');
+        }
       } else {
-        setError(data.error || 'Upload failed');
+        setError(data?.error || 'Upload failed');
       }
     } catch (err) {
       setError('An error occurred while uploading. Please try again.');
@@ -198,12 +202,12 @@ const ResumeUpload = () => {
                             stroke="var(--color-brand-900)" 
                             strokeWidth="12" 
                             strokeDasharray="351.8" 
-                            strokeDashoffset={351.8 - (351.8 * result.score) / 100} 
+                            strokeDashoffset={351.8 - (351.8 * (result.score || 0)) / 100} 
                             className="transition-all duration-1000 ease-out"
                           />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-4xl font-extrabold text-gray-900">{result.score}</span>
+                          <span className="text-4xl font-extrabold text-gray-900">{result.score || 0}</span>
                           <span className="text-xs font-bold text-gray-500 tracking-wider">SCORE</span>
                         </div>
                       </div>

@@ -1,7 +1,14 @@
 const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/auth', '/jobs') : 'http://localhost:5000/api/v1/jobs';
 
-export const getJobs = async (token) => {
-  const response = await fetch(API_URL, {
+export const getJobs = async (token, filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.role && filters.role.trim()) params.set('role', filters.role.trim());
+  if (filters.skills && filters.skills.trim()) params.set('skills', filters.skills.trim());
+  if (filters.deadline && filters.deadline.trim()) params.set('deadline', filters.deadline.trim());
+  const queryString = params.toString();
+  const url = queryString ? `${API_URL}?${queryString}` : API_URL;
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

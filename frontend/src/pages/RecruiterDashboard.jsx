@@ -1,16 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Sidebar from '../components/Sidebar';
 import TopHeader from '../components/TopHeader';
 import { Plus, Users, Briefcase, CheckCircle2, MoreHorizontal, Bookmark, BookmarkCheck } from 'lucide-react';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
+import { getJobs } from '../api/jobs';
 
 const RecruiterDashboard = () => {
-  const { user } = useSelector((state) => state.auth);
-  // Using empty arrays to demonstrate the new empty states
+  const { user, token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [postings, setPostings] = React.useState([]);
-  const [talentRadar, setTalentRadar] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  // We can derive total applicants from postings if they have applicantCount
+  const totalApplicants = postings.reduce((sum, job) => sum + (job.applicantCount || 0), 0);
+
+  useEffect(() => {
+    const fetchPostings = async () => {
+      try {
+        const res = await getJobs(token);
+        setPostings(res.data);
+      } catch (err) {
+        console.error('Failed to load active postings', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (token) fetchPostings();
+  }, [token]);
 
   return (
     <div className="flex bg-gray-50 min-h-screen font-sans">
@@ -28,7 +47,10 @@ const RecruiterDashboard = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Good morning, {user?.name || 'Recruiter'}.</h2>
                 <p className="text-gray-600">Here is what's happening with your recruitment pipeline today.</p>
               </div>
-              <button className="bg-brand-900 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm hover:bg-brand-800 transition-colors flex items-center">
+              <button 
+                onClick={() => navigate('/dashboard/recruiter/jobs/new')}
+                className="bg-brand-900 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm hover:bg-brand-800 transition-colors flex items-center"
+              >
                 <Plus className="w-5 h-5 mr-2" /> Post a Job
               </button>
             </div>
@@ -40,10 +62,10 @@ const RecruiterDashboard = () => {
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Applicants</h3>
                   <Users className="w-5 h-5 text-brand-900" />
                 </div>
-                <div className="text-4xl font-extrabold text-brand-900 mb-2">1,240</div>
+                <div className="text-4xl font-extrabold text-brand-900 mb-2">{totalApplicants}</div>
                 <div className="text-sm font-medium text-emerald-600 flex items-center">
                   <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                  12% since last month
+                  Looking good
                 </div>
               </div>
 
@@ -52,9 +74,9 @@ const RecruiterDashboard = () => {
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Active Postings</h3>
                   <Briefcase className="w-5 h-5 text-brand-900" />
                 </div>
-                <div className="text-4xl font-extrabold text-brand-900 mb-2">12</div>
+                <div className="text-4xl font-extrabold text-brand-900 mb-2">{postings.length}</div>
                 <div className="text-sm font-medium text-gray-500">
-                  4 ending this week
+                  All active
                 </div>
               </div>
 
@@ -63,10 +85,10 @@ const RecruiterDashboard = () => {
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Avg. Match Score</h3>
                   <CheckCircle2 className="w-5 h-5 text-brand-900" />
                 </div>
-                <div className="text-4xl font-extrabold text-brand-900 mb-2">78%</div>
+                <div className="text-4xl font-extrabold text-brand-900 mb-2">--</div>
                 <div className="text-sm font-medium text-amber-500 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  Target score is 80%
+                  <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Need more data
                 </div>
               </div>
             </div>
@@ -82,16 +104,50 @@ const RecruiterDashboard = () => {
                   </div>
                   
                   <div className="overflow-x-auto">
-                    {postings.length === 0 ? (
+                    {loading ? (
+                       <div className="p-8 text-center text-gray-500">Loading postings...</div>
+                    ) : postings.length === 0 ? (
                       <EmptyState 
                         icon={Briefcase}
                         title="No Active Postings"
                         description="You haven't posted any jobs yet. Create a new job posting to start finding great candidates."
-                        action={<Button variant="solid" className="mt-4"><Plus className="w-4 h-4 mr-2" /> Post a Job</Button>}
+                        action={<Button variant="solid" className="mt-4" onClick={() => navigate('/dashboard/recruiter/jobs/new')}><Plus className="w-4 h-4 mr-2" /> Post a Job</Button>}
                       />
                     ) : (
-                      <table className="w-full text-left border-collapse">
-                        {/* Table would go here */}
+                      <table className="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                          <tr className="border-b border-gray-100 text-sm text-gray-500 font-medium">
+                            <th className="p-4">Job Title</th>
+                            <th className="p-4 text-center">Applicants</th>
+                            <th className="p-4 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {postings.map(job => (
+                            <tr key={job._id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                              <td className="p-4 font-semibold text-gray-900">{job.title}</td>
+                              <td className="p-4 text-center">
+                                <span className="inline-block px-3 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-bold">
+                                  {job.applicantCount || 0}
+                                </span>
+                              </td>
+                              <td className="p-4 text-right">
+                                <Link 
+                                  to={`/dashboard/recruiter/jobs/${job._id}/applicants`}
+                                  className="text-sm text-brand-600 hover:text-brand-800 font-medium mr-4"
+                                >
+                                  View Applicants
+                                </Link>
+                                <Link 
+                                  to={`/dashboard/recruiter/jobs/${job._id}/edit`}
+                                  className="text-sm text-gray-500 hover:text-gray-900 font-medium"
+                                >
+                                  Edit
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
                       </table>
                     )}
                   </div>
@@ -110,15 +166,11 @@ const RecruiterDashboard = () => {
                   <p className="text-sm text-gray-500 mb-6">AI-powered matches across all active postings.</p>
 
                   <div className="space-y-4">
-                    {talentRadar.length === 0 ? (
-                      <EmptyState 
-                        icon={Users}
-                        title="No Talent Matches"
-                        description="Once you post jobs, AI will start recommending top talent right here."
-                      />
-                    ) : (
-                      <div>{/* Radar Items */}</div>
-                    )}
+                    <EmptyState 
+                      icon={Users}
+                      title="No Talent Matches"
+                      description="Once you post jobs and students apply, AI will start recommending top talent right here."
+                    />
                   </div>
                 </div>
               </div>

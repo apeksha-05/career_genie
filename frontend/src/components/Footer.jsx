@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -7,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center cursor-pointer mb-4">
+            <Link to="/" className="flex items-center mb-4">
               <div className="text-brand-900 mr-2">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
@@ -16,13 +17,12 @@ const Footer = () => {
                 </svg>
               </div>
               <span className="font-bold text-lg text-gray-900 tracking-tight">CareerGenie</span>
-            </div>
+            </Link>
             <p className="text-sm text-gray-500 mb-4 pr-4">
               Empowering campus careers through intelligent resume analysis and curated matching.
             </p>
             <div className="flex space-x-3">
               <div className="w-8 h-8 rounded-full bg-blue-50 flex-center text-brand-900 cursor-pointer hover:bg-brand-100 transition">
-                {/* dummy icon */}
                 <span className="font-bold text-sm">in</span>
               </div>
               <div className="w-8 h-8 rounded-full bg-blue-50 flex-center text-brand-900 cursor-pointer hover:bg-brand-100 transition">
@@ -34,20 +34,20 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">PLATFORM</h3>
             <ul className="space-y-3 text-sm text-gray-500">
-              <li><a href="#" className="hover:text-brand-900 transition">Find Jobs</a></li>
-              <li><a href="#" className="hover:text-brand-900 transition">Resume Analyzer</a></li>
-              <li><a href="#" className="hover:text-brand-900 transition">For Recruiters</a></li>
-              <li><a href="#" className="hover:text-brand-900 transition">Admin Portal</a></li>
+              <li><Link to="/dashboard/student/jobs" className="hover:text-brand-900 transition">Find Jobs</Link></li>
+              <li><Link to="/dashboard/student/resume" className="hover:text-brand-900 transition">Resume Analyzer</Link></li>
+              <li><Link to="/for-recruiters" className="hover:text-brand-900 transition">For Recruiters</Link></li>
+              <li><Link to="/companies" className="hover:text-brand-900 transition">Companies</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">COMPANY</h3>
             <ul className="space-y-3 text-sm text-gray-500">
-              <li><a href="#" className="hover:text-brand-900 transition">About Us</a></li>
-              <li><a href="#" className="hover:text-brand-900 transition">Contact Us</a></li>
-              <li><a href="#" className="hover:text-brand-900 transition">Careers</a></li>
-              <li><a href="#" className="hover:text-brand-900 transition">Support</a></li>
+              <li><Link to="/about" className="hover:text-brand-900 transition">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-brand-900 transition">Contact Us</Link></li>
+              <li><Link to="/resume-tips" className="hover:text-brand-900 transition">Career Tips</Link></li>
+              <li><Link to="/support" className="hover:text-brand-900 transition">Support</Link></li>
             </ul>
           </div>
 
@@ -76,8 +76,8 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <p>© 2024 CareerGenie. Empowering campus careers.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-gray-900 transition">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-900 transition">Terms of Service</a>
+            <Link to="/privacy" className="hover:text-gray-900 transition">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-gray-900 transition">Terms of Service</Link>
           </div>
         </div>
       </div>

@@ -20,7 +20,10 @@ const JobDetails = () => {
   useEffect(() => {
     if (!token || !id) return;
     getJobById(id, token)
-      .then(res => setJob(res.data))
+      .then(res => {
+        setJob(res.data);
+        if (res.data.hasApplied) setApplied(true);
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [id, token]);

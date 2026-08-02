@@ -101,9 +101,9 @@ const LandingPage = () => {
                 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
                   <span className="text-xs text-gray-400">Posted 2d ago</span>
-                  <button className="px-4 py-2 bg-brand-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Link to="/signup" className="px-4 py-2 bg-brand-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
 
@@ -127,9 +127,9 @@ const LandingPage = () => {
                 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
                   <span className="text-xs text-gray-400">Posted 5h ago</span>
-                  <button className="px-4 py-2 bg-brand-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Link to="/signup" className="px-4 py-2 bg-brand-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
 
@@ -153,9 +153,9 @@ const LandingPage = () => {
                 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
                   <span className="text-xs text-gray-400">Posted 1w ago</span>
-                  <button className="px-4 py-2 bg-brand-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Link to="/signup" className="px-4 py-2 bg-brand-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

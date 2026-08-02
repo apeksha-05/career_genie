@@ -27,9 +27,23 @@ app.use(cors({
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── Database Connection ─────────────────────────────────────────────────────
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/careergenie')
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/careergenie', {
+      serverSelectionTimeoutMS: 2000
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.log('Falling back to mongodb-memory-server...');
+    process.env.MONGOMS_MD5_CHECK = '0';
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
+    console.log('MongoDB connected (Memory Server)');
+  }
+};
+connectDB();
 
 // ── API Routes ──────────────────────────────────────────────────────────────
 app.use('/api/v1/auth',          authRoutes);

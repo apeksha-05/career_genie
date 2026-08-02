@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
-import { MoreHorizontal, Filter, Plus, Briefcase, PenTool, Cloud, Shield, Video, Trophy, Paperclip, Calendar } from 'lucide-react';
+import { MoreHorizontal, Filter, RefreshCw, Briefcase, Video, Trophy, Paperclip, Calendar } from 'lucide-react';
 import TopHeader from '../components/TopHeader';
 import { useSelector } from 'react-redux';
 import { getMyApplications } from '../api/applications';
@@ -19,46 +19,57 @@ const STATUS_MAP = {
 const ApplicationsTracker = () => {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const token = useSelector((state) => state.auth.token);
 
-  useEffect(() => {
+  const fetchApplications = useCallback(async (silent = false) => {
     if (!token) return;
-    getMyApplications(token)
-      .then(res => {
-        // Map API data to the kanban card shape
-        const mapped = (res.data || []).map(app => ({
-          id: app._id,
-          title: app.jobId?.title || 'Unknown Job',
-          company: app.jobId?.company || '',
-          date: new Date(app.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          match: `${app.matchPercentage ?? 0}%`,
-          status: STATUS_MAP[app.status] || app.status,
-          icon: Briefcase,
-        }));
-        setApps(mapped);
-      })
-      .catch((err) => setError(err.message || "Failed to load applications."))
-      .finally(() => setLoading(false));
+    if (!silent) setLoading(true);
+    else setRefreshing(true);
+    setError(null);
+    try {
+      const res = await getMyApplications(token);
+      const mapped = (res.data || []).map(app => ({
+        id: app._id,
+        title: app.jobId?.title || 'Unknown Job',
+        company: app.jobId?.company || '',
+        date: new Date(app.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        match: `${app.matchPercentage ?? 0}%`,
+        status: STATUS_MAP[app.status] || app.status,
+        rawStatus: app.status,
+        icon: Briefcase,
+      }));
+      setApps(mapped);
+    } catch (err) {
+      setError(err.message || 'Failed to load applications.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, [token]);
+
+  useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
   const getColumnColor = (status) => {
     switch(status) {
-      case 'Applied': return 'bg-gray-400';
+      case 'Applied':      return 'bg-gray-400';
       case 'Under Review': return 'bg-yellow-400';
-      case 'Interview': return 'bg-blue-500';
-      case 'Accepted': return 'bg-green-500';
-      default: return 'bg-gray-400';
+      case 'Interview':    return 'bg-blue-500';
+      case 'Accepted':     return 'bg-green-500';
+      case 'Rejected':     return 'bg-red-400';
+      default:             return 'bg-gray-400';
     }
   };
 
   const getBorderColor = (status) => {
     switch(status) {
-      case 'Applied': return 'border-gray-200';
+      case 'Applied':      return 'border-gray-200';
       case 'Under Review': return 'border-yellow-400';
-      case 'Interview': return 'border-blue-500';
-      case 'Accepted': return 'border-green-500';
-      default: return 'border-gray-200';
+      case 'Interview':    return 'border-blue-500';
+      case 'Accepted':     return 'border-green-500';
+      case 'Rejected':     return 'border-red-400';
+      default:             return 'border-gray-200';
     }
   };
 
@@ -79,10 +90,16 @@ const ApplicationsTracker = () => {
                 Monitor your professional journey. Manage your pipeline and track interview stages to keep your career momentum moving forward.
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                <Filter className="w-4 h-4 mr-2" />
-                Sort by: Most Recent
+            <div className="flex items-center space-x-3">
+              <button
+                id="refresh-applications-btn"
+                onClick={() => fetchApplications(true)}
+                disabled={refreshing}
+                title="Refresh to see latest status updates"
+                className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Refreshing...' : 'Refresh'}
               </button>
             </div>
           </div>

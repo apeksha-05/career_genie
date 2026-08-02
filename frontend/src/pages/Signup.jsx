@@ -153,7 +153,7 @@ const Signup = () => {
           <div className="flex items-start mt-4">
             <input id="terms" type="checkbox" required className="h-4 w-4 mt-1 text-brand-900 focus:ring-brand-500 border-gray-300 rounded" />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-600">
-              I agree to the <a href="#" className="text-brand-900 font-semibold hover:underline">Terms of Service</a> and <a href="#" className="text-brand-900 font-semibold hover:underline">Privacy Policy</a>.
+              I agree to the <Link to="/terms" className="text-brand-900 font-semibold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-brand-900 font-semibold hover:underline">Privacy Policy</Link>.
             </label>
           </div>
 

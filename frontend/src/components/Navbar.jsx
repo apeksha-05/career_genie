@@ -8,7 +8,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center cursor-pointer">
+          <Link to="/" className="flex-shrink-0 flex items-center">
             <div className="text-brand-900 mr-2">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
@@ -17,13 +17,13 @@ const Navbar = () => {
               </svg>
             </div>
             <span className="font-bold text-xl text-gray-900 tracking-tight">CareerGenie</span>
-          </div>
+          </Link>
 
           {/* Center Nav Links */}
           <div className="hidden md:flex space-x-10">
-            <a href="#jobs" className="text-gray-600 hover:text-brand-900 font-medium transition-colors">Jobs</a>
-            <a href="#resume" className="text-gray-600 hover:text-brand-900 font-medium transition-colors">Resume Tips</a>
-            <a href="#companies" className="text-gray-600 hover:text-brand-900 font-medium transition-colors">Companies</a>
+            <Link to="/companies" className="text-gray-600 hover:text-brand-900 font-medium transition-colors">Companies</Link>
+            <Link to="/resume-tips" className="text-gray-600 hover:text-brand-900 font-medium transition-colors">Resume Tips</Link>
+            <Link to="/for-recruiters" className="text-gray-600 hover:text-brand-900 font-medium transition-colors">For Recruiters</Link>
           </div>
 
           {/* Right Actions */}

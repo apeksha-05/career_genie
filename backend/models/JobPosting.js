@@ -24,6 +24,9 @@ const jobPostingSchema = new mongoose.Schema({
   salary: {
     type: String,
   },
+  deadline: {
+    type: Date,
+  },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],

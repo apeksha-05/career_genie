@@ -10,10 +10,10 @@ const TopHeader = ({ showNav = false, customRightItem = null }) => {
       <div className="flex-1 flex items-center">
         {showNav && (
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/jobs" className="text-sm font-bold text-brand-900 border-b-2 border-brand-900 pb-1">Jobs</Link>
-            <Link to="/tips" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors pb-1">Resume Tips</Link>
+            <Link to="/dashboard/student/jobs" className="text-sm font-bold text-brand-900 border-b-2 border-brand-900 pb-1">Jobs</Link>
+            <Link to="/resume-tips" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors pb-1">Resume Tips</Link>
             <Link to="/companies" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors pb-1">Companies</Link>
-            <Link to="/profile" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors pb-1">Profile</Link>
+            <Link to="#" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors pb-1">Profile</Link>
           </nav>
         )}
       </div>
